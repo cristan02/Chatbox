@@ -1,6 +1,8 @@
 import React, { useRef , useEffect , useState } from 'react';
 import axios from "axios";
 
+import './App.css';
+
 function Chat() {
 
     const clear = useRef()
@@ -14,7 +16,6 @@ function Chat() {
     const [teams,setTeams] = useState([])
     const [members,setMembers] = useState([])
     const [chats,setChats] = useState([])
-    const [chatlist,setChatList] =useState([])
 
     const [team,setTeam] = useState(1)
     const [teamname , setTeamname] = useState('team1')
@@ -26,6 +27,8 @@ function Chat() {
     const [sendtype , setSendtype] = useState(0)
 
     const [message , setMessage] = useState('')
+
+    const [memberdetails , setmemberdetails] = useState([])
 
 
     const changeTeam = (val,idx) =>{
@@ -41,6 +44,7 @@ function Chat() {
     }
 
     const changeMember = (val,idx) =>{
+        console.log(members)
         setSendtype(1)
         setReciever(val.id)
         setRecvName(val.name)
@@ -103,23 +107,49 @@ function Chat() {
     }
 
     const getmembers = () => {
-            axios.get("http://localhost:5000/getchatnumber/"+sender+'/'+team).then((res) => {
+            axios.get("http://localhost:5000/getmembers/"+team).then((res) => {
             const temp = res.data
-            console.log(res.data)
             if(temp != members)
             {
-                const tempmembers = []
+
+                
+                const tempmembers = [sendername]
+                const newtempmembers = []
                 const allmembers = []
+                const chatcnt = []
 
                 temp.map((val) =>{
-                    if(!tempmembers.includes(val.name))
+                    console.log(val)
+                        
+                    if (val.snd == sender && (!tempmembers.includes(val.name))){
                         tempmembers.push(val.name)
-                    if (val.snd == sender)
                         allmembers.push({id:val.rec,name:val.name,cnt:val.cnt})
+                        chatcnt.push(val.cnt)
+                        console.log('first ' ,val)
+                    }
+                    else console.log(val.snd , sender, (!tempmembers.includes(val.name)))
+                    if (!newtempmembers.includes(val.name) && val.senderid == null){
+                        allmembers.push({id:val.rec,name:val.name,cnt:val.cnt})
+                        chatcnt.push(val.cnt)
+                        newtempmembers.push(val.name)
+                        console.log('second' , val)
+                    }
                     
-                    setMembers(allmembers)
+                    
                 })
-                console.log(allmembers)
+                // temp.map((val) =>{
+                //     if(!newtempmembers.includes(val.name)){
+                //         newtempmembers.push(val.name)
+                //         allmembers.push({id:val.snd,name:val.name,cnt:val.cnt})
+                //     }
+
+                // })
+                setMembers(allmembers)
+                setmemberdetails(res.data)
+
+                console.clear()
+                console.log('all details',res.data)
+                console.log('all members',allmembers)
             }
             
 
@@ -130,6 +160,7 @@ function Chat() {
         {
             sendtype ?
                 axios.get("http://localhost:5000/getchats/"+sender+'/'+reciever).then((res) => {
+                    console.log("http://localhost:5000/getchats/"+sender+'/'+reciever)
                     setChats(res.data);
                 }) :
                 axios.get("http://localhost:5000/getgroupchats/"+team).then((res) => {
@@ -139,53 +170,34 @@ function Chat() {
         }     
     }
 
-    // const getChatNumber = () => {
-    //     axios.get("http://localhost:5000/getchatnumber/"+sender+'/'+team).then((res) => {
-    //         const temp = res.data
-
-    //         if(temp != members)
-    //         {
-    //             const tempmembers = []
-    //             const allmembers = []
-
-    //             temp.map((val) =>{
-    //                 if(tempmembers.includes(val.name))
-    //                     tempmembers.push(val.name)
-    //                 if (val.snd == sender)
-    //                     allmembers.push({name:val.name,cnt:val.cnt})
-                    
-    //                 setMembers(allmembers)
-    //             })
-    //         }
-            
-
-    //     })
-    // }
-
-
-   
-
-    useEffect(() => {
-        getChats()
-    })
+    const getChatNumber = () => {
+        axios.get("http://localhost:5000/getmembers/"+team).then((res) => {
+            if(res.data != memberdetails)
+                setmemberdetails(res.data)
+        })
+    }
 
     const refresh = () =>{
         getTeams()
         getmembers()
     }
 
-      useEffect(() => {
-        getmembers()
-      },[team])
+    useEffect(() => {
+        getChats()
+        //getChatNumber()
+    })
+
+    //   useEffect(() => {
+    //     getmembers()
+    //   },[team , memberdetails])
 
       useEffect(() => {
-        //getChats()
-      },[reciever , recvname])
+        getmembers()
+      },[team ])
 
       useEffect(() => {
         getTeams()
         getmembers()
-        getChats()
       },[])
 
     return (
@@ -220,7 +232,7 @@ function Chat() {
                         <div className='flex'>
                             <svg className='w-4 cursor-pointer' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M0 128C0 92.7 28.7 64 64 64H320c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128zM559.1 99.8c10.4 5.6 16.9 16.4 16.9 28.2V384c0 11.8-6.5 22.6-16.9 28.2s-23 5-32.9-1.6l-96-64L416 337.1V320 192 174.9l14.2-9.5 96-64c9.8-6.5 22.4-7.2 32.9-1.6z"/></svg>
                             <p className='p-1'></p>
-                            <div className='font-semibold rounded-full bg-blue-100 w-7 h-7 flex justify-center items-center'>0</div>
+                            <div className='font-semibold rounded-full bg-blue-100 w-7 h-7 flex justify-center items-center'>{val.cnt}</div>
                         </div>
                     </div>
                 ))}
@@ -239,9 +251,9 @@ function Chat() {
                     </div>
                 </div>
 
-                <div className='pb-6 w-full h-full p-4 grid content-between bg-[#CAEBF2]'>
+                <div className='pb-6 w-full h-full p-4 grid content-between bg-[#CAEBF2] overflow-y-hidden '>
 
-                    <div className=' overflow-y-auto grid '>
+                    <div className=' overflow-y-auto grid container flex'>
                         { chats && chats.map((chat) =>(
                             (sender == chat.rec) ?
                                 <div className='justify-self-start'>

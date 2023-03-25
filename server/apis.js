@@ -34,20 +34,22 @@ app.get('/getteams/:name', (req, res) => {
     }
   })
 })
-app.get('/getmembers/:id', (req, res) => {
+app.get('/getmembers/:tid', (req, res) => {
   const q =
-  `select count(status = 0) as cnt ,snd, rec, tid , name from members
-  left join messages
-  on  members.id = rec 
-  where sndgp is null and tid = ? and snd = ?
-  group by snd, sndgp, rec, name, tid
-  UNION
-  select count(status = 0) as cnt ,snd, rec, tid , name from members
-  left join messages
-  on  members.id = rec 
-  where sndgp is null and tid = ?
-  group by snd, sndgp, rec, name, tid;`
-  db.query(q,[req.params.id], (err, rows) => {
+    `SELECT T1.cnt, T1.snd, T1.rec, T1.tid , T2.name
+    FROM (select count(status = 0) as cnt,snd, rec, tid , name from members
+    left join messages
+    on  members.id = snd
+    where sndgp is null and tid = ?
+    group by snd,rec, tid , name) AS T1
+    JOIN (select count(status = 0) as cnt,snd, rec, tid , name from members
+    left join messages
+    on  members.id = rec
+    where sndgp is null and tid = ?
+    group by snd,rec, tid , name) AS T2
+    ON T1.cnt = T2.cnt
+    ORDER BY cnt desc;`
+  db.query(q, [req.params.tid , req.params.tid], (err, rows) => {
     if (err) {
       res.send(err)
     } else {
@@ -73,28 +75,6 @@ app.get('/getgroupchats/:sndgp', (req, res) => {
     `select snd,sndgp as rec, message from messages
     where sndgp = ?;`
   db.query(q, [req.params.sndgp], (err, rows) => {
-    if (err) {
-      res.send(err)
-    } else {
-      res.send(rows)
-    }
-  })
-})
-
-app.get('/getchatnumber/:snd/:tid', (req, res) => {
-  const q =
-    `select count(status = 0) as cnt ,snd, rec, tid , name from members
-    left join messages
-    on  members.id = rec 
-    where sndgp is null and tid = ? and snd = ?
-    group by snd, sndgp, rec, name, tid
-    UNION
-    select count(status = 0) as cnt ,snd, rec, tid , name from members
-    left join messages
-    on  members.id = rec 
-    where sndgp is null and tid = ?
-    group by snd, sndgp, rec, name, tid;`
-  db.query(q, [req.params.tid , req.params.snd , req.params.tid], (err, rows) => {
     if (err) {
       res.send(err)
     } else {
@@ -150,3 +130,17 @@ app.post('/group', (req, res) => {
   app.listen(port, () => {
     console.log(`Server started on port ${port}`)
   })
+
+  // sql query to replace getmembers
+    /*SELECT T1.cnt, T1.snd, T1.rec, T1.tid , T2.name
+      FROM (select count(status = 0) as cnt,snd, rec, tid , name from members
+      left join messages
+      on  members.id = snd
+      where sndgp is null and tid = ?
+      group by snd,rec, tid , name) AS T1
+      JOIN (select count(status = 0) as cnt,snd, rec, tid , name from members
+      left join messages
+      on  members.id = rec
+      where sndgp is null and tid = ?
+      group by snd,rec, tid , name) AS T2
+      ON T1.cnt = T2.cnt */
