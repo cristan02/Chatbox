@@ -36,19 +36,7 @@ app.get('/getteams/:name', (req, res) => {
 })
 app.get('/getmembers/:tid', (req, res) => {
   const q =
-    `SELECT T1.cnt, T1.snd, T1.rec, T1.tid , T2.name
-    FROM (select count(status = 0) as cnt,snd, rec, tid , name from members
-    left join messages
-    on  members.id = snd
-    where sndgp is null and tid = ?
-    group by snd,rec, tid , name) AS T1
-    JOIN (select count(status = 0) as cnt,snd, rec, tid , name from members
-    left join messages
-    on  members.id = rec
-    where sndgp is null and tid = ?
-    group by snd,rec, tid , name) AS T2
-    ON T1.cnt = T2.cnt
-    ORDER BY cnt desc;`
+    `select id,name from members where tid = 1`
   db.query(q, [req.params.tid , req.params.tid], (err, rows) => {
     if (err) {
       res.send(err)
@@ -59,8 +47,9 @@ app.get('/getmembers/:tid', (req, res) => {
 })
 app.get('/getchats/:snd/:rec', (req, res) => {
   const q =
-    `select snd,rec,message from messages
-    where (snd =? and rec =?) or (snd =? and rec =?);`
+    `select snd,rec,message ,time_format(time , '%k:%i') as time , status from messages 
+    where (snd =? and rec =?) or (snd =? and rec =?)
+    order by id ;`
   db.query(q,[req.params.snd , req.params.rec , req.params.rec , req.params.snd], (err, rows) => {
     if (err) {
       res.send(err)
@@ -70,10 +59,15 @@ app.get('/getchats/:snd/:rec', (req, res) => {
   })
 })
 
+
 app.get('/getgroupchats/:sndgp', (req, res) => {
   const q =
-    `select snd,sndgp as rec, message from messages
-    where sndgp = ?;`
+    `select snd,sndgp as rec, message , name ,time_format(time , '%k:%i') as time ,status
+    from messages
+    left join members
+    on members.id = snd
+    where sndgp = ?
+    order by messages.id;`
   db.query(q, [req.params.sndgp], (err, rows) => {
     if (err) {
       res.send(err)
@@ -110,14 +104,13 @@ app.post('/group', (req, res) => {
     })
   })
 
-  app.put('/student/update/:id', (req, res) => {
+  app.put('/updatestatus/:snd/:rec', (req, res) => {
     const q = `
-    update student
-    set fname = ?, lname = ?
-    where s_id = ?
+    UPDATE messages
+    SET status = 1
+    WHERE snd = ? and rec = ?;
     `
-    const { fname, lname } = req.body
-    db.query(q, [fname, lname, req.params.id], (err, rows) => {
+    db.query(q, [req.params.snd , req.params.rec], (err, rows) => {
       if (err) {
         res.send(err)
       } else {
@@ -125,6 +118,7 @@ app.post('/group', (req, res) => {
       }
     })
   })
+
   
   
   app.listen(port, () => {

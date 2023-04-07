@@ -5,13 +5,14 @@ import './index.css';
 import Signup from './Signup'
 import Signin from './Signin'
 import Chat from './Chat'
+import Call from './Call'
 
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <Chat/>
+    <Call/>
   </React.StrictMode>
 );
 
