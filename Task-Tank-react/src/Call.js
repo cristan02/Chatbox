@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState , createContext   } from 'react';
 import Peer from 'peerjs';
 import './App.css';
 
 function Call() {
+
+  const UserContext = createContext()
 
   const [recievingCall, setRecievingCall] = useState(0)
   const callReciever = useRef(null)
@@ -46,7 +48,7 @@ function Call() {
   }, [])
  
 
-  const endCall = () => {
+  const endCall = () => {              
     let conn = peerInstance.current.connect(remotePeerIdValue)
         conn.on('open', function() {
           conn.on('data', function(data) {
@@ -88,16 +90,24 @@ function Call() {
   }
 
   return (
-    <div className="App">
-      <h1>Current user id is {peerId}</h1>
-      <input type="text" value={remotePeerIdValue} onChange={e => setRemotePeerIdValue(e.target.value)} />
-      <button onClick={() => call(remotePeerIdValue)}>Call</button>
-      <div >
-        <video ref={currentUserVideoRef} muted playsInline autoPlay/>
+    <div className="bg-[#030712] h-screen w-full flex flex-col p-10 justify-center items-center">
+      <h1 className='text-gray-500'>Current user id is {peerId}</h1>
+
+      <input className='bg-gray-100' type="text" value={remotePeerIdValue} onChange={e => setRemotePeerIdValue(e.target.value)} />
+
+      <button className='bg-gray-100' onClick={() => call(remotePeerIdValue)}>Call</button>
+
+      <div className='flex flex-col justify-center items-center'>
+        <div className='lg:w-full grid lg:grid-cols-2 sm:grid-cols-1 gap-2 bg-[#0f172a] rounded-lg justify-items-center p-6 bg-opacity-25'>
+          <video className='lg:h-auto sm:h-[300px] rounded' ref={currentUserVideoRef} muted playsInline autoPlay/>
+          <video className='lg:h-auto sm:h-[300px] rounded' ref={currentUserVideoRef} muted playsInline autoPlay/>
+          {/* <video className='sm:h-[200px]' ref={remoteVideoRef} playsInline autoPlay onError={()=>console.log('video play error')}/> */}
+        </div>
+        <div className=' w-full flex justify-center'>
+          <div className='rounded-full'></div>
+        </div>
       </div>
-      <div>
-        <video ref={remoteVideoRef} playsInline autoPlay onError={()=>console.log('video play error')}/>
-      </div>
+
       { recievingCall? 
 				<div className="">
 							<h1 > is calling...</h1>

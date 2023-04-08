@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import {BrowserRouter , Routes ,Route} from 'react-router-dom'
 
 import Signup from './Signup'
 import Signin from './Signin'
@@ -12,7 +13,13 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <Call/>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Chat/>} />
+        <Route path='/chat' element={<Chat/>} />
+        <Route path='/call' element={<Call/>} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>
 );
 
