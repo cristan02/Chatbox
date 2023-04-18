@@ -231,7 +231,7 @@ function Chat() {
 
                 <div className='pb-6 w-full h-full p-4 grid content-between bg-[#CAEBF2] overflow-y-hidden '>
 
-                    <div className=' overflow-y-auto grid container flex'>
+                    <div className=' overflow-y-auto grid container'>
                         { chats && chats.map((chat) =>(
                             sendtype ? 
                                 (sender == chat.rec) ?
@@ -282,7 +282,7 @@ function Chat() {
 
                     </div>
 
-                    <div className='w-full flex relative grid '>
+                    <div className='w-full relative grid '>
                         <input ref={clear} placeholder='Message...' className='w-full bg-[#0D253A] rounded-md px-4 py-2 pr-9 text-white flex items-center' onChange={(e)=>{setMessage(e.target.value)}}
                         ></input>
                         <button onClick={()=>{sendMessage()}} className='absolute justify-self-end self-center mr-1 p-2 bg-[#0D253A]'><svg className='w-4 right-0 fill-white' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480V396.4c0-4 1.5-7.8 4.2-10.7L331.8 202.8c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z"/></svg></button>

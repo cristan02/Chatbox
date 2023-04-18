@@ -7,6 +7,7 @@ import Signup from './Signup'
 import Signin from './Signin'
 import Chat from './Chat'
 import Call from './Call'
+import Groupcall from './Groupcall'
 
 import reportWebVitals from './reportWebVitals';
 
@@ -18,6 +19,7 @@ root.render(
         <Route path='/' element={<Chat/>} />
         <Route path='/chat' element={<Chat/>} />
         <Route path='/call' element={<Call/>} />
+        <Route path='/groupcall' element={<Groupcall/>} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
