@@ -19,8 +19,8 @@ function Chat() {
     const [team, setTeam] = useState()
     const [sendtype , setSendtype] = useState(0)
     const [reciever , setReciever] = useState()
-    const [teamname , setTeamname] = useState()
-    const [recvname , setRecvName] = useState()
+    const [teamname , setTeamname] = useState('')
+    const [recvname , setRecvName] = useState('')
     
 
     
@@ -54,12 +54,12 @@ function Chat() {
         setTeamname(val.name)
         setRecvName(val.name)
 
-        selectedTeam.current[selectTeamidx].className = 'flex justify-between py-2 px-4 bg-white'
-        selectedTeam.current[idx].className = 'flex justify-between py-2 px-4 bg-[#CAEBF2]'
+        selectedTeam.current[selectTeamidx].className = 'flex justify-between py-2 px-4 bg-white rounded hover:bg-[#CAEBF2] cursor-pointer mt-1'
+        selectedTeam.current[idx].className = 'flex justify-between py-2 px-4 bg-[#CAEBF2] rounded cursor-pointer mt-1'
         setselectTeamidx(idx)
 
-        selectedMember.current[selectMemberidx].className = 'flex justify-between py-2 px-4 bg-white'
-        selectedMember.current[0].className = 'flex justify-between py-2 px-4 bg-[#CAEBF2] '
+        selectedMember.current[selectMemberidx].className = 'flex justify-between py-2 px-4 bg-white rounded hover:bg-[#CAEBF2] cursor-pointer mt-1'
+        selectedMember.current[0].className = 'flex justify-between py-2 px-4 bg-[#CAEBF2] rounded cursor-pointer mt-1'
         setselectMemberidx(0)
     }
 
@@ -68,8 +68,8 @@ function Chat() {
         setReciever(val.id)
         setRecvName(val.name)
 
-        selectedMember.current[selectMemberidx].className = 'flex justify-between py-2 px-4 bg-white'
-        selectedMember.current[idx+1].className = 'flex justify-between py-2 px-4 bg-[#CAEBF2] '
+        selectedMember.current[selectMemberidx].className = 'flex justify-between py-2 px-4 bg-white rounded hover:bg-[#CAEBF2] cursor-pointer mt-1'
+        selectedMember.current[idx+1].className = 'flex justify-between py-2 px-4 bg-[#CAEBF2] rounded cursor-pointer mt-1'
         setselectMemberidx(idx+1)
     }
 
@@ -77,8 +77,8 @@ function Chat() {
         setRecvName(teamname)
         setSendtype(0)
         setTeam(team)
-        selectedMember.current[selectMemberidx].className = 'flex justify-between py-2 px-4 bg-white '
-        selectedMember.current[0].className = 'flex justify-between py-2 px-4 bg-[#CAEBF2] '
+        selectedMember.current[selectMemberidx].className = 'flex justify-between py-2 px-4 bg-white rounded hover:bg-[#CAEBF2] cursor-pointer mt-1'
+        selectedMember.current[0].className = 'flex justify-between py-2 px-4 bg-[#CAEBF2] rounded cursor-pointer mt-1'
         setselectMemberidx(0)
     }
 
@@ -173,23 +173,25 @@ function Chat() {
     return (
         <div className='flex w-full'>
             
-            <div className='w-1/4 h-screen border-r-2 flex flex-col justify-between'>
-               <div>
+            <div className='w-1/4 h-screen border-r-2 flex flex-col justify-between pt-1'>
+               <div className='px-1'>
                     {teams && teams.map((val,index) => (
-                    <div key={index} onClick={()=>{changeTeam(val,index)}} className='cursor-pointer flex justify-between py-2 px-4 hover:bg-[#CAEBF2] ' ref={el => selectedTeam.current[index] = el}>
+                    <div key={index} onClick={()=>{changeTeam(val,index)}} className='rounded cursor-pointer flex justify-between py-2 px-4 hover:bg-[#CAEBF2] mt-1' ref={el => selectedTeam.current[index] = el}>
                          <div className='flex'>
                             <svg className='w-6' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M72 88a56 56 0 1 1 112 0A56 56 0 1 1 72 88zM64 245.7C54 256.9 48 271.8 48 288s6 31.1 16 42.3V245.7zm144.4-49.3C178.7 222.7 160 261.2 160 304c0 34.3 12 65.8 32 90.5V416c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V389.2C26.2 371.2 0 332.7 0 288c0-61.9 50.1-112 112-112h32c24 0 46.2 7.5 64.4 20.3zM448 416V394.5c20-24.7 32-56.2 32-90.5c0-42.8-18.7-81.3-48.4-107.7C449.8 183.5 472 176 496 176h32c61.9 0 112 50.1 112 112c0 44.7-26.2 83.2-64 101.2V416c0 17.7-14.3 32-32 32H480c-17.7 0-32-14.3-32-32zm8-328a56 56 0 1 1 112 0A56 56 0 1 1 456 88zM576 245.7v84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM320 32a64 64 0 1 1 0 128 64 64 0 1 1 0-128zM240 304c0 16.2 6 31 16 42.3V261.7c-10 11.3-16 26.1-16 42.3zm144-42.3v84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM448 304c0 44.7-26.2 83.2-64 101.2V448c0 17.7-14.3 32-32 32H288c-17.7 0-32-14.3-32-32V405.2c-37.8-18-64-56.5-64-101.2c0-61.9 50.1-112 112-112h32c61.9 0 112 50.1 112 112z"/></svg>
                             <p className='p-1'></p>
                             <div className='font-semibold h-7'>{val.name}</div>
                          </div>
+                         <button className='p-1 rounded-md cursor-pointer hover:bg-[#a6c5cc]'>
+                            <svg className='w-4'  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/></svg>
+                         </button>
                     </div>
                     ))}
                     <p className='p-1'></p>
-                    <button className='flex justify-center items-center bg-slate-400 py-2 px-4 w-full border-4
-                    border-double  rounded-md border-black'>
+                    <button className='w-full flex justify-center items-center bg-[#43a3b8] hover:bg-[#43a4c6] py-2 px-4 border-4 border-double  rounded-md border-black hover:border-solid'>
                         <svg className='w-4' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
                         <p className='p-1'></p>
-                        <div className='font-semibold text-md'>Create Team</div>
+                        <div className='font-semibold '>Create Team</div>
                     </button>
                </div>
                <button className='bg-red-200 hover:bg-red-400 flex justify-center items-center border border-gray-600 py-2 px-4 rounded cursor m-1'>
@@ -200,24 +202,36 @@ function Chat() {
             </div>
         
 
-            <div className='w-1/4 h-screen border-r-2 '>
+            <div className='w-1/4 h-screen border-r-2 px-1 pt-1'>
                 {team && <div>
-                    <div  className='cursor-pointer flex justify-between  py-2 px-4 hover:bg-[#CAEBF2]  ' ref={el => selectedMember.current[0] = el} onClick={() => selectgroup()}>
-                    <div className='flex '>
-                        <svg className='w-6' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M72 88a56 56 0 1 1 112 0A56 56 0 1 1 72 88zM64 245.7C54 256.9 48 271.8 48 288s6 31.1 16 42.3V245.7zm144.4-49.3C178.7 222.7 160 261.2 160 304c0 34.3 12 65.8 32 90.5V416c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V389.2C26.2 371.2 0 332.7 0 288c0-61.9 50.1-112 112-112h32c24 0 46.2 7.5 64.4 20.3zM448 416V394.5c20-24.7 32-56.2 32-90.5c0-42.8-18.7-81.3-48.4-107.7C449.8 183.5 472 176 496 176h32c61.9 0 112 50.1 112 112c0 44.7-26.2 83.2-64 101.2V416c0 17.7-14.3 32-32 32H480c-17.7 0-32-14.3-32-32zm8-328a56 56 0 1 1 112 0A56 56 0 1 1 456 88zM576 245.7v84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM320 32a64 64 0 1 1 0 128 64 64 0 1 1 0-128zM240 304c0 16.2 6 31 16 42.3V261.7c-10 11.3-16 26.1-16 42.3zm144-42.3v84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM448 304c0 44.7-26.2 83.2-64 101.2V448c0 17.7-14.3 32-32 32H288c-17.7 0-32-14.3-32-32V405.2c-37.8-18-64-56.5-64-101.2c0-61.9 50.1-112 112-112h32c61.9 0 112 50.1 112 112z"/></svg>
-                        <p className='p-1'></p>
-                        <div className='font-semibold h-7'>{teamname}</div>
-                    </div>
+                    <div  className='rounded cursor-pointer flex justify-between  py-2 px-4 hover:bg-[#CAEBF2] mt-1 ' ref={el => selectedMember.current[0] = el} onClick={() => selectgroup()}>
+                        <div className='flex '>
+                            <svg className='w-6' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M72 88a56 56 0 1 1 112 0A56 56 0 1 1 72 88zM64 245.7C54 256.9 48 271.8 48 288s6 31.1 16 42.3V245.7zm144.4-49.3C178.7 222.7 160 261.2 160 304c0 34.3 12 65.8 32 90.5V416c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V389.2C26.2 371.2 0 332.7 0 288c0-61.9 50.1-112 112-112h32c24 0 46.2 7.5 64.4 20.3zM448 416V394.5c20-24.7 32-56.2 32-90.5c0-42.8-18.7-81.3-48.4-107.7C449.8 183.5 472 176 496 176h32c61.9 0 112 50.1 112 112c0 44.7-26.2 83.2-64 101.2V416c0 17.7-14.3 32-32 32H480c-17.7 0-32-14.3-32-32zm8-328a56 56 0 1 1 112 0A56 56 0 1 1 456 88zM576 245.7v84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM320 32a64 64 0 1 1 0 128 64 64 0 1 1 0-128zM240 304c0 16.2 6 31 16 42.3V261.7c-10 11.3-16 26.1-16 42.3zm144-42.3v84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM448 304c0 44.7-26.2 83.2-64 101.2V448c0 17.7-14.3 32-32 32H288c-17.7 0-32-14.3-32-32V405.2c-37.8-18-64-56.5-64-101.2c0-61.9 50.1-112 112-112h32c61.9 0 112 50.1 112 112z"/></svg>
+                            <p className='p-1'></p>
+                            <div className='font-semibold h-7'>{teamname}</div>
+                        </div>
+                        <button className='p-1 rounded-md cursor-pointer hover:bg-[#a6c5cc]'>
+                                <svg className='w-4' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z"/></svg>
+                        </button>
                     </div>
                     {members && members.map((val,index) => (
-                        <div key={index} onClick={()=>{changeMember(val,index)}} className='flex justify-between  py-2 px-4 hover:bg-[#CAEBF2] cursor-pointer' ref={el => selectedMember.current[index+1] = el} >
+                        <div key={index} onClick={()=>{changeMember(val,index)}} className='flex justify-between  py-2 px-4 hover:bg-[#CAEBF2] cursor-pointer rounded mt-1' ref={el => selectedMember.current[index+1] = el} >
                             <div className='flex'>
                                 <svg className='w-6' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M399 384.2C376.9 345.8 335.4 320 288 320H224c-47.4 0-88.9 25.8-111 64.2c35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z"/></svg>
                                 <p className='p-1'></p>
                                 <div className='font-semibold h-7'>{val.name}</div>
                             </div>
+                            <button className='p-1 rounded-md cursor-pointer hover:bg-[#a6c5cc]'>
+                                <svg className='w-4' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z"/></svg>
+                            </button>
                         </div>
                     ))}
+                    <p className='p-1'></p>
+                    <button className='w-full flex justify-center items-center bg-[#43a3b8] hover:bg-[#43a4c6] py-2 px-4 border-4 border-double  rounded-md border-black hover:border-solid'>
+                        <svg className='w-4' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
+                        <p className='p-1'></p>
+                        <div className='font-semibold '>Add Member</div>
+                    </button>
                 </div>}
             </div>
 
@@ -225,12 +239,9 @@ function Chat() {
             <div className='w-2/4 h-screen flex flex-col '>
                 <div className='w-full flex justify-between items-center py-4 px-6 bg-orange-200 h-fit'>
                     <div className='flex '>
-                        {(sessionStorage.getItem('image') == null)? 
-                            <img className='w-6' src={sessionStorage.getItem('image')} alt='pic'></img> : 
-                            <svg className='w-6' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M399 384.2C376.9 345.8 335.4 320 288 320H224c-47.4 0-88.9 25.8-111 64.2c35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z"/></svg>}
-                        
-                        <p className='p-2'></p>
-                        <div className='font-semibold'>{recvname}</div>
+                            <img className='w-8 rounded-full border-black ' src={sessionStorage.getItem('image')} alt='pic'></img>
+                            <p className='p-2'></p>
+                            <div className='font-semibold'>{recvname}</div>
                     </div>
                     <svg className='w-5 cursor-pointer' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M0 128C0 92.7 28.7 64 64 64H320c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128zM559.1 99.8c10.4 5.6 16.9 16.4 16.9 28.2V384c0 11.8-6.5 22.6-16.9 28.2s-23 5-32.9-1.6l-96-64L416 337.1V320 192 174.9l14.2-9.5 96-64c9.8-6.5 22.4-7.2 32.9-1.6z"/></svg>
             

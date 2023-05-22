@@ -137,14 +137,27 @@ app.post('/group', (req, res) => {
   })
 
   app.post('/signup', (req, res) => {
-    const { name , email, password } = req.body
-    const q = 'insert into members values (null , ? , ? , ? , null);'
+    const { name , email, password , image , type } = req.body
+    const q = 'insert into members values (null , ? , ? , ? , ? , ?);'
 
-    db.query(q, [name , email, password], (err, rows) => {
+    db.query(q, [name , email, password , image , type], (err, rows) => {
       if (err) {
-        res.send('Account with Email Id already exists')
+        res.send(err)
       } else {
         res.send('Account Successfully created')
+      }
+    })
+  })
+
+  app.post('/googleverify', (req, res) => {
+    const { email } = req.body
+    const q = 'select * from members where email = ?;'
+
+    db.query(q, [ email], (err, rows) => {
+      if (err) {
+        res.send('error')
+      } else {
+        res.send(rows)
       }
     })
   })
