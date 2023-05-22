@@ -1,11 +1,27 @@
-import React, { useRef , useEffect , useState } from 'react';
-import axios from "axios";
+import React, { useRef , useEffect , useState } from 'react'
+import axios from "axios"
+import {Link , useNavigate } from 'react-router-dom'
 
-import './App.css';
+import '../App.css';
 
 function Chat() {
 
     const clear = useRef()
+    const navigate = useNavigate()
+
+    const [sender , setSender] = useState(sessionStorage.getItem('id')) // my id
+
+    const [teams,setTeams] = useState([])
+    const [members,setMembers] = useState([])
+    const [chats,setChats] = useState([])
+
+
+    const [team, setTeam] = useState()
+    const [sendtype , setSendtype] = useState(0)
+    const [reciever , setReciever] = useState()
+    const [teamname , setTeamname] = useState()
+    const [recvname , setRecvName] = useState()
+    
 
     
     const selectedTeam = useRef([])
@@ -14,21 +30,22 @@ function Chat() {
     const selectedMember = useRef([])
     const [selectMemberidx,setselectMemberidx] = useState(0)
 
-    const [teams,setTeams] = useState([])
-    const [members,setMembers] = useState([])
-    const [chats,setChats] = useState([])
-
-    const [team, setTeam] = useState(1)
-    const [teamname , setTeamname] = useState('team1')
-
-    const [sendername , setSendername] = useState('Reeve') //set user
-    const [recvname , setRecvName] = useState('My Team')
-    const [sender , setSender] = useState(2)
-    const [reciever , setReciever] = useState(2)
-
-    const [sendtype , setSendtype] = useState(0)
-
+    
+    const [sendername , setSendername] = useState(sessionStorage.getItem('name')) 
     const [message , setMessage] = useState('')
+
+    const getmembers = () => {
+        axios.get("http://localhost:5000/getmembers/"+team).then((res) => {
+            const temp = []
+            res.data.map((val) =>{
+                if(val.name != sendername)
+                    temp.push(val)
+            })
+            setMembers(temp)
+
+        })
+    }
+
 
     const changeTeam = (val,idx) =>{
         setTeam(val.id)
@@ -99,26 +116,7 @@ function Chat() {
             clear.current.value = '';
             setMessage('')
         }
-    }
-
-
-    const getTeams =() => {
-        axios.get("http://localhost:5000/getteams/" + sendername).then((res) => {
-          setTeams(res.data)
-        });
-    }
-
-    const getmembers = () => {
-        axios.get("http://localhost:5000/getmembers/"+team).then((res) => {
-            const temp = []
-            res.data.map((val) =>{
-                if(val.name != sendername)
-                    temp.push(val)
-            })
-            setMembers(temp)
-
-        })
-    }
+    } 
 
     const getChats = () => {
         {
@@ -133,11 +131,6 @@ function Chat() {
         }     
     }
 
-    const refresh = () =>{
-        getTeams()
-        getmembers()
-    }
-
     const updatestatus = () => {
         if(sendtype == 1 )
         {
@@ -149,79 +142,93 @@ function Chat() {
         }
     }
 
+    const logout = () => {
+        if(window.confirm('You will be logged out?')){
+            sessionStorage.removeItem('id');
+            sessionStorage.removeItem('name');
+            sessionStorage.removeItem('email');
+            sessionStorage.removeItem('image');
+            navigate("/signin")
+        }
+    }
+
     useEffect(() => {
         getChats()
         updatestatus()
     })
 
-      useEffect(() => {
+    useEffect(() => {
         getmembers()
-      },[team])
+    },[team])
 
-      useEffect(() => {
-        getTeams()
-        getmembers()
+    useEffect(() => {      
+        axios.get("http://localhost:5000/getteams/" + sender).then((res) => {
+          setTeams(res.data)
+        })
 
-        selectedMember.current[0].className = 'flex justify-between py-2 px-4 bg-[#CAEBF2] '
-        setselectMemberidx(0)
-        // selectedTeam.current[0].className = 'flex justify-between py-2 px-4 bg-[#CAEBF2]'
-        // setselectTeamidx(0)
-      },[])
+    },[])
+
+
 
     return (
         <div className='flex w-full'>
             
-            <div className='w-1/4 h-screen border-r-2 '>
-            {/* <button className='bg-blue-100 p-2' onClick={()=>{setSendername('Ashbourn')}}>click1</button>
-            <button className='bg-green-100 p-2' onClick={()=>{setSender(1)}}>click2</button>
-            <button className='bg-red-100 p-2' onClick={()=>{refresh()}}>click3</button> */}
-                {teams && teams.map((val,index) => (
+            <div className='w-1/4 h-screen border-r-2 flex flex-col justify-between'>
+               <div>
+                    {teams && teams.map((val,index) => (
                     <div key={index} onClick={()=>{changeTeam(val,index)}} className='cursor-pointer flex justify-between py-2 px-4 hover:bg-[#CAEBF2] ' ref={el => selectedTeam.current[index] = el}>
                          <div className='flex'>
                             <svg className='w-6' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M72 88a56 56 0 1 1 112 0A56 56 0 1 1 72 88zM64 245.7C54 256.9 48 271.8 48 288s6 31.1 16 42.3V245.7zm144.4-49.3C178.7 222.7 160 261.2 160 304c0 34.3 12 65.8 32 90.5V416c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V389.2C26.2 371.2 0 332.7 0 288c0-61.9 50.1-112 112-112h32c24 0 46.2 7.5 64.4 20.3zM448 416V394.5c20-24.7 32-56.2 32-90.5c0-42.8-18.7-81.3-48.4-107.7C449.8 183.5 472 176 496 176h32c61.9 0 112 50.1 112 112c0 44.7-26.2 83.2-64 101.2V416c0 17.7-14.3 32-32 32H480c-17.7 0-32-14.3-32-32zm8-328a56 56 0 1 1 112 0A56 56 0 1 1 456 88zM576 245.7v84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM320 32a64 64 0 1 1 0 128 64 64 0 1 1 0-128zM240 304c0 16.2 6 31 16 42.3V261.7c-10 11.3-16 26.1-16 42.3zm144-42.3v84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM448 304c0 44.7-26.2 83.2-64 101.2V448c0 17.7-14.3 32-32 32H288c-17.7 0-32-14.3-32-32V405.2c-37.8-18-64-56.5-64-101.2c0-61.9 50.1-112 112-112h32c61.9 0 112 50.1 112 112z"/></svg>
                             <p className='p-1'></p>
-                            <div className='font-semibold'>{val.name}</div>
+                            <div className='font-semibold h-7'>{val.name}</div>
                          </div>
-                        <div className='flex'>
-                            <div className='font-semibold rounded-full bg-transparent w-7 h-7 flex justify-center items-center'></div>
-                            <svg className='w-4 cursor-pointer' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3zM504 312V248H440c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V136c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H552v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>
-                        </div>
                     </div>
-                ))}
+                    ))}
+                    <p className='p-1'></p>
+                    <button className='flex justify-center items-center bg-slate-400 py-2 px-4 w-full border-4
+                    border-double  rounded-md border-black'>
+                        <svg className='w-4' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
+                        <p className='p-1'></p>
+                        <div className='font-semibold text-md'>Create Team</div>
+                    </button>
+               </div>
+               <button className='bg-red-200 hover:bg-red-400 flex justify-center items-center border border-gray-600 py-2 px-4 rounded cursor m-1'>
+                <svg className='w-5' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/></svg>
+                <p className='p-1'></p>
+                <div className='font-bold text-lg' onClick={logout}>Logout</div>
+               </button>
             </div>
         
 
             <div className='w-1/4 h-screen border-r-2 '>
-                <div  className='cursor-pointer flex justify-between  py-2 px-4 hover:bg-[#CAEBF2]  ' ref={el => selectedMember.current[0] = el} onClick={() => selectgroup()}>
-                    <div className='flex'>
+                {team && <div>
+                    <div  className='cursor-pointer flex justify-between  py-2 px-4 hover:bg-[#CAEBF2]  ' ref={el => selectedMember.current[0] = el} onClick={() => selectgroup()}>
+                    <div className='flex '>
                         <svg className='w-6' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M72 88a56 56 0 1 1 112 0A56 56 0 1 1 72 88zM64 245.7C54 256.9 48 271.8 48 288s6 31.1 16 42.3V245.7zm144.4-49.3C178.7 222.7 160 261.2 160 304c0 34.3 12 65.8 32 90.5V416c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V389.2C26.2 371.2 0 332.7 0 288c0-61.9 50.1-112 112-112h32c24 0 46.2 7.5 64.4 20.3zM448 416V394.5c20-24.7 32-56.2 32-90.5c0-42.8-18.7-81.3-48.4-107.7C449.8 183.5 472 176 496 176h32c61.9 0 112 50.1 112 112c0 44.7-26.2 83.2-64 101.2V416c0 17.7-14.3 32-32 32H480c-17.7 0-32-14.3-32-32zm8-328a56 56 0 1 1 112 0A56 56 0 1 1 456 88zM576 245.7v84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM320 32a64 64 0 1 1 0 128 64 64 0 1 1 0-128zM240 304c0 16.2 6 31 16 42.3V261.7c-10 11.3-16 26.1-16 42.3zm144-42.3v84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM448 304c0 44.7-26.2 83.2-64 101.2V448c0 17.7-14.3 32-32 32H288c-17.7 0-32-14.3-32-32V405.2c-37.8-18-64-56.5-64-101.2c0-61.9 50.1-112 112-112h32c61.9 0 112 50.1 112 112z"/></svg>
                         <p className='p-1'></p>
-                        <div className='font-semibold'>{teamname}</div>
+                        <div className='font-semibold h-7'>{teamname}</div>
                     </div>
-                    <div className='flex'>
-                            <div className='font-semibold rounded-full bg-transparent w-7 h-7 flex justify-center items-center'></div>
                     </div>
-                </div>
-                {members && members.map((val,index) => (
-                    <div key={index} onClick={()=>{changeMember(val,index)}} className='flex justify-between  py-2 px-4 hover:bg-[#CAEBF2] cursor-pointer' ref={el => selectedMember.current[index+1] = el} >
-                        <div className='flex'>
-                            <svg className='w-6' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M399 384.2C376.9 345.8 335.4 320 288 320H224c-47.4 0-88.9 25.8-111 64.2c35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z"/></svg>
-                            <p className='p-1'></p>
-                            <div className='font-semibold'>{val.name}</div>
+                    {members && members.map((val,index) => (
+                        <div key={index} onClick={()=>{changeMember(val,index)}} className='flex justify-between  py-2 px-4 hover:bg-[#CAEBF2] cursor-pointer' ref={el => selectedMember.current[index+1] = el} >
+                            <div className='flex'>
+                                <svg className='w-6' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M399 384.2C376.9 345.8 335.4 320 288 320H224c-47.4 0-88.9 25.8-111 64.2c35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z"/></svg>
+                                <p className='p-1'></p>
+                                <div className='font-semibold h-7'>{val.name}</div>
+                            </div>
                         </div>
-                        <div className='flex'>
-                            <div className='font-semibold rounded-full bg-transparent w-7 h-7 flex justify-center items-center'></div>
-                            <svg className='w-2 cursor-pointer' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"><path d="M246.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L178.7 256 41.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg>
-                        </div>
-                    </div>
-                ))}
+                    ))}
+                </div>}
             </div>
 
 
             <div className='w-2/4 h-screen flex flex-col '>
                 <div className='w-full flex justify-between items-center py-4 px-6 bg-orange-200 h-fit'>
-                    <div className='flex'>
-                        <svg className='w-6' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M399 384.2C376.9 345.8 335.4 320 288 320H224c-47.4 0-88.9 25.8-111 64.2c35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z"/></svg>
+                    <div className='flex '>
+                        {(sessionStorage.getItem('image') == null)? 
+                            <img className='w-6' src={sessionStorage.getItem('image')} alt='pic'></img> : 
+                            <svg className='w-6' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M399 384.2C376.9 345.8 335.4 320 288 320H224c-47.4 0-88.9 25.8-111 64.2c35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z"/></svg>}
+                        
                         <p className='p-2'></p>
                         <div className='font-semibold'>{recvname}</div>
                     </div>

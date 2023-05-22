@@ -21,12 +21,11 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.get('/getteams/:name', (req, res) => {
+app.get('/getteams/:id', (req, res) => {
   const q =
-    `select team.id , team.name from team
-    left join members
-    on team.id=tid where members.name = ?;`
-  db.query(q,[req.params.name], (err, rows) => {
+    `select team.id , team.name from team , members , membersteam
+    where team.id = membersteam.tid and members.id = membersteam.mid and members.id = ?;`
+  db.query(q,[req.params.id], (err, rows) => {
     if (err) {
       res.send(err)
     } else {
@@ -34,9 +33,11 @@ app.get('/getteams/:name', (req, res) => {
     }
   })
 })
+
 app.get('/getmembers/:tid', (req, res) => {
   const q =
-    `select id,name from members where tid = 1`
+    `select members.id , members.name from team , members , membersteam
+    where team.id = membersteam.tid and members.id = membersteam.mid and team.id = ?;`
   db.query(q, [req.params.tid , req.params.tid], (err, rows) => {
     if (err) {
       res.send(err)
@@ -45,6 +46,7 @@ app.get('/getmembers/:tid', (req, res) => {
     }
   })
 })
+
 app.get('/getchats/:snd/:rec', (req, res) => {
   const q =
     `select snd,rec,message ,time_format(time , '%k:%i') as time , status from messages 
@@ -83,7 +85,7 @@ app.post('/group', (req, res) => {
       'insert into messages(snd,sndgp,rec,message,time,status) values (?,?,?,?,?,?);'
     const { snd,sndgp,rec,message,time,status } = req.body
     db.query(q, [snd,sndgp,rec,message,time,status], (err, rows) => {
-      if (err) {
+      if (err ) {
         res.send(err)
       } else {
         res.send('Success')
@@ -120,21 +122,36 @@ app.post('/group', (req, res) => {
   })
 
   
+  app.post('/signin', (req, res) => {
+    const { email, password } = req.body
+    const q =
+      'select * from members where email = ? and password = ?;'
+   
+    db.query(q, [email, password], (err, rows) => {
+      if (err) {
+        console.log(err)
+      } else {
+         res.send(rows)
+      }
+    })
+  })
+
+  app.post('/signup', (req, res) => {
+    const { name , email, password } = req.body
+    const q = 'insert into members values (null , ? , ? , ? , null);'
+
+    db.query(q, [name , email, password], (err, rows) => {
+      if (err) {
+        res.send('Account with Email Id already exists')
+      } else {
+        res.send('Account Successfully created')
+      }
+    })
+  })
+
+  
   
   app.listen(port, () => {
     console.log(`Server started on port ${port}`)
   })
 
-  // sql query to replace getmembers
-    /*SELECT T1.cnt, T1.snd, T1.rec, T1.tid , T2.name
-      FROM (select count(status = 0) as cnt,snd, rec, tid , name from members
-      left join messages
-      on  members.id = snd
-      where sndgp is null and tid = ?
-      group by snd,rec, tid , name) AS T1
-      JOIN (select count(status = 0) as cnt,snd, rec, tid , name from members
-      left join messages
-      on  members.id = rec
-      where sndgp is null and tid = ?
-      group by snd,rec, tid , name) AS T2
-      ON T1.cnt = T2.cnt */

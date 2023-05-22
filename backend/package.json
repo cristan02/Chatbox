@@ -9,6 +9,6 @@
     "socket.io": "^4.6.1"
   },
   "scripts": {
-		"dev": "nodemon room.js"
+		"start": "nodemon apis.js"
 	}
 }

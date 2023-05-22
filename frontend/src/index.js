@@ -3,11 +3,9 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import {BrowserRouter , Routes ,Route} from 'react-router-dom'
 
-import Signup from './Signup'
-import Signin from './Signin'
-import Chat from './Chat'
-import Call from './Call'
-import Groupcall from './Groupcall'
+import Signup from './routes/Signup'
+import Signin from './routes/Signin'
+import Chat from './routes/Chat'
 
 import reportWebVitals from './reportWebVitals';
 
@@ -16,10 +14,10 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<Chat/>} />
+        <Route path='/' element={<Signup/>} />
+        <Route path='/signup' element={<Signup/>} />
+        <Route path='/signin' element={<Signin/>} />
         <Route path='/chat' element={<Chat/>} />
-        <Route path='/call' element={<Call/>} />
-        <Route path='/groupcall' element={<Groupcall/>} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
