@@ -6,6 +6,12 @@ import '../App.css';
 
 function Chat() {
 
+    const [showTeamModal, setShowTeamModal] = useState(false)
+    const closeTeamModal = () => setShowTeamModal(false)
+    const openTeamModal = () => setShowTeamModal(true)
+
+    const [newTeamName,setNewTeamName] = useState('')
+
     const clear = useRef()
     const navigate = useNavigate()
 
@@ -152,6 +158,35 @@ function Chat() {
         }
     }
 
+    const checkKey = (e) => {
+        if(e.key === 'Enter') 
+            sendMessage()
+    }
+
+    const createTeam = (e) => {
+        e.preventDefault()  
+
+        axios
+        .post("http://localhost:5000/createteam", {
+            name : newTeamName ,
+            leader : sender
+        })
+        .then((res) => {
+            window.location.reload()
+        })
+       
+    }
+
+    const exitTeam = () => {
+        console.log('http://localhost:5000/exitteam/' + team + '/' + sender)     
+        axios.delete('http://localhost:5000/exitteam/' + team + '/' + sender).then((res) => {
+            if (res.data) {
+              alert('Deleted Scccessfully')
+              window.location.reload()
+            } else alert('Some Error has occured')
+        })
+    }
+
     useEffect(() => {
         getChats()
         updatestatus()
@@ -171,24 +206,24 @@ function Chat() {
 
 
     return (
-        <div className='flex w-full'>
+        <div className='flex w-full  h-screen'>
             
-            <div className='w-1/4 h-screen border-r-2 flex flex-col justify-between pt-1'>
+            <div className='w-1/4 flex flex-col border-r-2 px-1 justify-between pt-1'>
                <div className='px-1'>
                     {teams && teams.map((val,index) => (
-                    <div key={index} onClick={()=>{changeTeam(val,index)}} className='rounded cursor-pointer flex justify-between py-2 px-4 hover:bg-[#CAEBF2] mt-1' ref={el => selectedTeam.current[index] = el}>
+                    <div key={index} onClick={()=>{changeTeam(val,index)}} className='bg-white rounded cursor-pointer flex justify-between py-2 px-4 hover:bg-[#CAEBF2] mt-1' ref={el => selectedTeam.current[index] = el}>
                          <div className='flex'>
                             <svg className='w-6' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M72 88a56 56 0 1 1 112 0A56 56 0 1 1 72 88zM64 245.7C54 256.9 48 271.8 48 288s6 31.1 16 42.3V245.7zm144.4-49.3C178.7 222.7 160 261.2 160 304c0 34.3 12 65.8 32 90.5V416c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V389.2C26.2 371.2 0 332.7 0 288c0-61.9 50.1-112 112-112h32c24 0 46.2 7.5 64.4 20.3zM448 416V394.5c20-24.7 32-56.2 32-90.5c0-42.8-18.7-81.3-48.4-107.7C449.8 183.5 472 176 496 176h32c61.9 0 112 50.1 112 112c0 44.7-26.2 83.2-64 101.2V416c0 17.7-14.3 32-32 32H480c-17.7 0-32-14.3-32-32zm8-328a56 56 0 1 1 112 0A56 56 0 1 1 456 88zM576 245.7v84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM320 32a64 64 0 1 1 0 128 64 64 0 1 1 0-128zM240 304c0 16.2 6 31 16 42.3V261.7c-10 11.3-16 26.1-16 42.3zm144-42.3v84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM448 304c0 44.7-26.2 83.2-64 101.2V448c0 17.7-14.3 32-32 32H288c-17.7 0-32-14.3-32-32V405.2c-37.8-18-64-56.5-64-101.2c0-61.9 50.1-112 112-112h32c61.9 0 112 50.1 112 112z"/></svg>
                             <p className='p-1'></p>
                             <div className='font-semibold h-7'>{val.name}</div>
                          </div>
                          <button className='p-1 rounded-md cursor-pointer hover:bg-[#a6c5cc]'>
-                            <svg className='w-4'  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/></svg>
+                            <svg className='w-4' xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 576 512"><path d="M320 32c0-9.9-4.5-19.2-12.3-25.2S289.8-1.4 280.2 1l-179.9 45C79 51.3 64 70.5 64 92.5V448H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H96 288h32V480 32zM256 256c0 17.7-10.7 32-24 32s-24-14.3-24-32s10.7-32 24-32s24 14.3 24 32zm96-128h96V480c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H512V128c0-35.3-28.7-64-64-64H352v64z"/></svg>
                          </button>
                     </div>
                     ))}
                     <p className='p-1'></p>
-                    <button className='w-full flex justify-center items-center bg-[#43a3b8] hover:bg-[#43a4c6] py-2 px-4 border-4 border-double  rounded-md border-black hover:border-solid'>
+                    <button className='w-full flex justify-center items-center bg-[#43a3b8] hover:bg-[#43a4c6] py-2 px-4 border-4 border-double  rounded-md border-black hover:border-solid' onClick={()=>{openTeamModal()}}>
                         <svg className='w-4' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
                         <p className='p-1'></p>
                         <div className='font-semibold '>Create Team</div>
@@ -199,12 +234,13 @@ function Chat() {
                 <p className='p-1'></p>
                 <div className='font-bold text-lg' onClick={logout}>Logout</div>
                </button>
+            
             </div>
         
 
-            <div className='w-1/4 h-screen border-r-2 px-1 pt-1'>
+            <div className='w-1/4 border-r-2 px-1 pt-1'>
                 {team && <div>
-                    <div  className='rounded cursor-pointer flex justify-between  py-2 px-4 hover:bg-[#CAEBF2] mt-1 ' ref={el => selectedMember.current[0] = el} onClick={() => selectgroup()}>
+                    <div  className='bg-white rounded cursor-pointer flex justify-between  py-2 px-4 hover:bg-[#CAEBF2] mt-1 ' ref={el => selectedMember.current[0] = el} onClick={() => selectgroup()}>
                         <div className='flex '>
                             <svg className='w-6' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M72 88a56 56 0 1 1 112 0A56 56 0 1 1 72 88zM64 245.7C54 256.9 48 271.8 48 288s6 31.1 16 42.3V245.7zm144.4-49.3C178.7 222.7 160 261.2 160 304c0 34.3 12 65.8 32 90.5V416c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V389.2C26.2 371.2 0 332.7 0 288c0-61.9 50.1-112 112-112h32c24 0 46.2 7.5 64.4 20.3zM448 416V394.5c20-24.7 32-56.2 32-90.5c0-42.8-18.7-81.3-48.4-107.7C449.8 183.5 472 176 496 176h32c61.9 0 112 50.1 112 112c0 44.7-26.2 83.2-64 101.2V416c0 17.7-14.3 32-32 32H480c-17.7 0-32-14.3-32-32zm8-328a56 56 0 1 1 112 0A56 56 0 1 1 456 88zM576 245.7v84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM320 32a64 64 0 1 1 0 128 64 64 0 1 1 0-128zM240 304c0 16.2 6 31 16 42.3V261.7c-10 11.3-16 26.1-16 42.3zm144-42.3v84.7c10-11.3 16-26.1 16-42.3s-6-31.1-16-42.3zM448 304c0 44.7-26.2 83.2-64 101.2V448c0 17.7-14.3 32-32 32H288c-17.7 0-32-14.3-32-32V405.2c-37.8-18-64-56.5-64-101.2c0-61.9 50.1-112 112-112h32c61.9 0 112 50.1 112 112z"/></svg>
                             <p className='p-1'></p>
@@ -215,7 +251,7 @@ function Chat() {
                         </button>
                     </div>
                     {members && members.map((val,index) => (
-                        <div key={index} onClick={()=>{changeMember(val,index)}} className='flex justify-between  py-2 px-4 hover:bg-[#CAEBF2] cursor-pointer rounded mt-1' ref={el => selectedMember.current[index+1] = el} >
+                        <div key={index} onClick={()=>{changeMember(val,index)}} className='bg-white flex justify-between  py-2 px-4 hover:bg-[#CAEBF2] cursor-pointer rounded mt-1' ref={el => selectedMember.current[index+1] = el} >
                             <div className='flex'>
                                 <svg className='w-6' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M399 384.2C376.9 345.8 335.4 320 288 320H224c-47.4 0-88.9 25.8-111 64.2c35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z"/></svg>
                                 <p className='p-1'></p>
@@ -226,17 +262,26 @@ function Chat() {
                             </button>
                         </div>
                     ))}
-                    <p className='p-1'></p>
-                    <button className='w-full flex justify-center items-center bg-[#43a3b8] hover:bg-[#43a4c6] py-2 px-4 border-4 border-double  rounded-md border-black hover:border-solid'>
+                </div>}
+
+                <p className='p-1'></p>
+                <button className='w-full flex justify-center items-center bg-[#43a3b8] hover:bg-[#43a4c6] py-2 px-4 border-4 border-double  rounded-md border-black hover:border-solid'>
                         <svg className='w-4' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
                         <p className='p-1'></p>
-                        <div className='font-semibold '>Add Member</div>
-                    </button>
-                </div>}
+                        <div className='font-semibold '>Invite Member</div>
+                </button>
+
+                <p className='p-1'></p>
+
+                <button className='w-full flex justify-center items-center py-2 px-4 border-4 border-double  rounded-md border-black hover:border-solid bg-red-200 hover:bg-red-400'  onClick={exitTeam}>
+                    <svg className='w-4' xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 576 512"><path d="M320 32c0-9.9-4.5-19.2-12.3-25.2S289.8-1.4 280.2 1l-179.9 45C79 51.3 64 70.5 64 92.5V448H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H96 288h32V480 32zM256 256c0 17.7-10.7 32-24 32s-24-14.3-24-32s10.7-32 24-32s24 14.3 24 32zm96-128h96V480c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H512V128c0-35.3-28.7-64-64-64H352v64z"/></svg>
+                    <p className='p-1'></p>
+                    <div className='font-semibold' >Leave Team</div>
+               </button>
             </div>
 
 
-            <div className='w-2/4 h-screen flex flex-col '>
+            <div className='w-2/4 flex flex-col px-1'>
                 <div className='w-full flex justify-between items-center py-4 px-6 bg-orange-200 h-fit'>
                     <div className='flex '>
                             <img className='w-8 rounded-full border-black ' src={sessionStorage.getItem('image')} alt='pic'></img>
@@ -301,12 +346,87 @@ function Chat() {
                     </div>
 
                     <div className='w-full relative grid '>
-                        <input ref={clear} placeholder='Message...' className='w-full bg-[#0D253A] rounded-md px-4 py-2 pr-9 text-white flex items-center' onChange={(e)=>{setMessage(e.target.value)}}
-                        ></input>
+                        <input ref={clear} placeholder='Message...' className='w-full bg-[#0D253A] rounded-md px-4 py-2 pr-9 text-white flex items-center' onChange={(e)=>{setMessage(e.target.value)}} onKeyPress={(e)=>{checkKey(e)}} />
                         <button onClick={()=>{sendMessage()}} className='absolute justify-self-end self-center mr-1 p-2 bg-[#0D253A]'><svg className='w-4 right-0 fill-white' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480V396.4c0-4 1.5-7.8 4.2-10.7L331.8 202.8c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z"/></svg></button>
                    </div>
                 </div>
             </div>
+
+
+
+            {showTeamModal ? (
+                <>
+                    <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+                        <div className="relative w-auto my-6 mx-auto max-w-6xl">
+                        <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                            <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
+                            <button
+                                onClick={closeTeamModal}
+                                type="button"
+                                className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
+                                data-modal-toggle="popup-modal"
+                            >
+                                <svg
+                                aria-hidden="true"
+                                className="w-5 h-5"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                                xmlns="http://www.w3.org/2000/svg"
+                                >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                    clip-rule="evenodd"
+                                ></path>
+                                </svg>
+                                <span className="sr-only">Close modal</span>
+                            </button>
+                            <div className="p-6 text-left">
+                                <div className="text-center font-semibold">Create New Team</div>
+                                <div className="bg-white px-4 py-5 sm:p-6">
+                                <div className="">
+                                    <form
+                                    className="grid grid-cols-3 gap-6"
+                                    onSubmit={createTeam}
+                                    >
+                                    <div className="col-span-3">
+                                        <label
+                                        htmlFor="type"
+                                        className="block text-sm font-medium text-gray-700"
+                                        >
+                                        Team Name
+                                        </label>
+                                        <input
+                                        required
+                                        
+                                        type="text"
+                                        id="Tname"
+                                        name="tname"
+                                        
+                                        className="mt-1 block w-full rounded-md border-2 border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+
+                                        onChange={(e)=>{setNewTeamName(e.target.value)}}
+                                        ></input>
+                                    </div>
+
+                                    <div/>                                   
+
+                                    <button className="inline-flex justify-center rounded-md border border-transparent bg-blue-700 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                        Create
+                                    </button>
+                                    </form>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+                </>
+            ) : null}
+
+            
             
 
         </div>

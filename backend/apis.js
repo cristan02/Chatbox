@@ -162,6 +162,30 @@ app.post('/group', (req, res) => {
     })
   })
 
+  app.post('/createteam', (req, res) => {
+    const { name , leader } = req.body
+    const q = 'insert into team values(null ,?,?);'
+
+    db.query(q, [name , leader], (err, rows) => {
+      if (err) {
+        res.send(err)
+      } else {
+        res.send('Team created')
+      }
+    })
+  })
+
+  app.delete('/exitteam/:tid/:mid', (req, res) => {
+    const q = 'delete from membersteam where tid = ? and mid = 4?;'
+    db.query(q, [req.params.tid , req.params.mid], (err, rows) => {
+      if (err) {
+        res.send(err)
+      } else {
+        res.send('Exited from team')
+      }
+    })
+  })
+
   
   
   app.listen(port, () => {
